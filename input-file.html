@@ -1,0 +1,315 @@
+  <div class="rightPanel clearfix">
+  	<div><!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="description" content="123" />
+<title>冷笑话投稿</title>
+<link href="/newAdd/css/weixin/global2014.css" rel="stylesheet" type="text/css" />
+<style>
+.res_img{display:none;}
+.sourcePlan{width:600px;height:auto;position:absolute;left:-000px;top:0;z-index:-30;}
+.loading{}
+</style>
+
+</head>
+
+<body>
+
+	<!-- 提示 第二版（2014/2/11） -->
+	<div class="noticeBox2">
+		正在加载提示
+		<!-- 成功 -->
+		<!-- <span class="notice_icoSuc"></span>哦也，稿件提交成功！ -->
+
+		<!-- 失败 -->
+		<!-- <span class="notice_icoErr"></span>哦也，稿件提交成功！ -->
+	</div>
+	<div class="noticeBoxShadow"></div>
+	<!-- <form action="/app/ClientDraft/addWeixin" method="post" enctype="multipart/form-data" > -->
+	<section class="messagePlan">
+		<div class="textAreaContainer">
+			<textarea name="content" class="message_textArea">分享身边的搞笑事儿（嫑少于6个字）          即有机会被采纳并推荐到微信！</textarea>
+			<span class="textArea_wordNum">250</span>
+		</div>
+		<div class="nameInput imgUpload">
+			<a href="javascript:;" class="delImg">×</a>
+			<input type="button" class="faceIco"/>
+		</div>
+		<div class="nameInput">
+			<input type="text" name="nick" class="nameInputText" value="昵称" />
+		</div>
+		<input type="submit" name="dosubmit" class="messageSubmit" value="发布"/>
+	</section>
+	
+	<div class="sourcePlan" style="position:absolute;z-index:-1000;left:-8000px;"></div>
+	
+	<div class="hidePlan">
+		<canvas id="drawCanvas" width="600" height="0" style="border:1px solid #ccc;background:#fff;z-index:-18;position:absolute;left:-8000px;top:0;"></canvas>
+		<canvas id="compressCanvas" height="0" style="border:2px solid #000;background:#fff;position:absolute;z-index:-18px;left:0px;top:-8400px;"></canvas>
+	</div>
+	<div class="imgPlan" style="display:none"></div>
+	
+	<input type="file" class="checks" value="上传图片" multiple accept="image/*" style="position:absolute;left:-2000px;z-index:-20" />
+	
+	<!-- </form> -->
+</body>
+
+<script src="/newAdd/js/zepto.js" language="javascript" type="text/javascript"></script>
+<script src="/newAdd/js/zepto.global.js" language="javascript" type="text/javascript"></script>
+<script src="/newAdd/js/addWeixin.js" language="javascript" type="text/javascript"></script>
+<script>
+		/**
+			upload
+			compressed_img_obj 上传图片地址
+			upload_url 接口地址
+			file_input_name
+			filename
+			callback 回调
+		*/
+		function upload(compressed_img_obj,upload_url, file_input_name, filename, callback, finialDatas) {
+
+			//ADD sendAsBinary compatibilty to older browsers
+			if(XMLHttpRequest.prototype.sendAsBinary === undefined) {
+
+				XMLHttpRequest.prototype.sendAsBinary = function(string) {
+					var bytes =Array.prototype.map.call(string,
+					function(c) {
+						return c.charCodeAt(0) & 0xff;
+					});
+					this.send(new Uint8Array(bytes).buffer);
+				};
+			}
+
+			var type = "image/jpeg";
+			
+			var data = compressed_img_obj.replace('data:' + type + ';base64,', '');
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', upload_url, true);
+			var boundary = 'someboundary';
+
+			xhr.setRequestHeader('Content-Type','multipart/form-data; boundary=' + boundary);
+			xhr.sendAsBinary(['--' + boundary,'Content-Disposition: form-data; name="' + file_input_name + '"; filename="' + filename + '"', 'Content-Type: ' + type, '', atob(data), '--' + boundary + '--'].join('\r\n'));
+
+			xhr.onreadystatechange = function()
+
+			{
+				if(this.readyState == 0){
+					console.log("未初始化");
+				}
+				if(this.readyState == 1){
+					console.log("链接已建立");
+				}
+				if(this.readyState == 2){
+					console.log("请求已接收");
+				}
+				if(this.readyState == 3){
+					console.log("请求处理中");
+				}
+				if (this.readyState == 4 && this.status == 200) {
+					//alert(this.responseText);
+					//显示缩略图
+					/*
+					$("#result_image").show();
+
+					$(".imgUpload").removeClass("loading");
+					
+					
+					*/
+					
+					//alert(this.responseText);
+					
+					$('<img src="'+finialDatas+'" class="ulPic" />').appendTo(".imgUpload");
+					
+					// 完成操作，去掉加载
+					$(".sourcePic").remove();
+					$(".imgUpload").removeClass("loading");
+					$(".checks").remove();
+					var datas = $.parseJSON(this.responseText);
+					$(".faceIco").attr('data-id', datas.image_id);
+					
+				}
+			};
+
+		}
+		function compress(){
+			
+			var mime_type = "image/jpeg";
+			//取值设置画布大小
+			var sourceWidth = $(".sourcePlan").attr("totalWi");
+			var sourceHeight = $(".sourcePlan").attr("totalHi");
+			
+			$("#drawCanvas").attr("width",sourceWidth).attr("height",sourceHeight);
+			//循环拼接
+			var nextTop = 0;
+			var cvs = document.getElementById("drawCanvas");
+			
+			$(".sourcePic").each(function(i){
+				var mySrc = $(this).attr("src"),
+					myHi = $(this).attr("data-height");
+				var drawPic = new Image();
+					drawPic.src = mySrc;
+				
+				cvs.getContext("2d").drawImage(drawPic, 0, nextTop);
+				nextTop += parseInt(myHi);
+			});
+			//输出
+			var finialDat = cvs.toDataURL(mime_type);
+			
+			
+			
+			var callback = function(){
+				alert("done");
+			}
+			
+			var output_format = "jpg";
+			upload(finialDat,'/app/clientDraft/upload', 'upload_pic','new.' + output_format, callback, finialDat)
+		}
+		function getFile(obj){
+			
+			var fileArray = obj.files;
+			
+			
+			if(fileArray.length > 3){
+				var tpl = "最多只可上传3张图片";
+				$(".noticeBox2").html(tpl)
+				// 通知弹窗居中
+				doo.noticeWidth();
+				$(".noticeBox2").removeClass('noticeBox2_out').css('opacity', 1);
+				setTimeout('$(".noticeBox2").css("opacity", 0).addClass("noticeBox2_out")', 2000);
+				return;
+			}
+			
+			//创建加载
+			$(".delImg").show();
+			$(".imgUpload").addClass("loading");
+			
+			var compressObj = document.getElementById("compressCanvas");
+			var mime_type = "image/jpeg";
+			var quality = 30;
+			
+			var totalWi = 0,
+				totalHi = 0;
+			
+			var loadPic = function(num){
+				console.log(num);
+				//全部加载完成，调用压缩函数
+				if(num == fileArray.length){
+					setTimeout("compress()",1000);
+					return;
+				}
+				var reader = new FileReader();
+				reader.readAsDataURL(fileArray[num]);
+				reader.onload = function(){
+					var pic = new Image();
+						pic.src = this.result;
+						pic.onload = function(){
+							
+							var wi = parseInt(pic.naturalWidth),
+								hi = parseInt(pic.naturalHeight),
+								wihi = wi/hi;
+							
+							console.log("1. wi:"+wi+",hi:"+hi);
+							//原图超出范围后	
+							if( wi > hi && wi > 600 ){
+								wi = 600;
+								hi = wi / wihi;
+							}else if( hi > wi && hi > 600 ){
+								hi = 600;
+								wi = hi * wihi; 
+							}
+							console.log("2. wi:"+wi+",hi:"+hi);
+							
+							wi < 600 && (totalWi = wi);
+							wi > totalWi && (totalWi = wi);
+							totalHi += hi;
+							
+							//alert("wi:"+wi+",hi:"+hi);
+							
+							$("#compressCanvas").attr({"width":wi,"height":hi});
+							
+							compressObj.getContext("2d").drawImage(pic, 0, 0, wi, hi);
+							var newImageData = compressObj.toDataURL(mime_type, quality / 100);
+							
+							$('<img src="'+newImageData+'" data-width="'+wi+'" data-height="'+hi+'" class="sourcePic" />').appendTo(".sourcePlan");
+							$(".sourcePlan").attr({"totalWi":totalWi,"totalHi":totalHi});
+							
+							loadPic(num+1);
+						}
+				}
+			}
+			
+			loadPic(0);
+			
+		}
+	
+	Zepto(function($){
+		
+		/*删除操作*/
+		$(".delImg").live("click",function() {
+			$(".delImg").css("display", "none");
+			$(".faceIco").attr('data-url', "");
+			$(".faceIco").attr('data-id', "");
+			$(".imgUpload").removeClass("loading");
+			$(".ulPic").remove();
+			$("#fileElem").remove();
+			$(".checks").remove();
+			var dcanvas = $("#drawCanvas");
+			var ccancas = $("#compressCanvas");
+			dcanvas.get(0).getContext("2d").clearRect(0, 0, dcanvas.width(), dcanvas.height());
+			ccancas.get(0).getContext("2d").clearRect(0, 0, ccancas.width(), ccancas.height());
+		});
+		
+		$(".faceIco").on("click",function(){
+			if($(".checks").length <= 0){
+				$('<input type="file" class="checks" value="上传图片" multiple accept="image/*" style="position:absolute;left:-2000px;z-index:-20" />').appendTo("body");
+			}
+			$(".checks").click();
+		});
+		
+		$(".checks").live("change",function(){
+			getFile(this);
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	// share friend
+	document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+		// 发送给好友
+		WeixinJSBridge.on('menu:share:appmessage', function (argv) {
+			WeixinJSBridge.invoke('sendAppMessage', {
+				"img_url": "http://wx.lengxiaohua.cn/statics/happy-new-year/images/fx.jpg",
+				"img_width": "120",
+				"img_height": "120",
+				"link": window.location.href,
+				"desc":  "",
+				"title": "冷笑话精选投稿"
+			}, function (res) {
+				_report('send_msg', res.err_msg);
+			})
+		});
+
+		// 分享到朋友圈
+		WeixinJSBridge.on('menu:share:timeline', function (argv) {
+			WeixinJSBridge.invoke('shareTimeline', {
+				"img_url": "http://wx.lengxiaohua.cn/statics/happy-new-year/images/fx.jpg",
+				"img_width": "120",
+				"img_height": "120",
+				"link": window.location.href,
+				"desc":  "",
+				"title": "冷笑话精选投稿"
+			}, function (res) {
+				_report('timeline', res.err_msg);
+			});
+		});
+	}, false)
+</script>
+
+</html></div>
+  </div>

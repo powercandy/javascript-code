@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>随机颜色</title>
+	<style type="text/css">
+		* {
+			margin: 0;
+			padding: 0;
+		}
+		.random-color {
+			width: 100px;
+			height: 100px;
+			border-radius: 50%;
+			border: 1px solid #000;
+		}
+	</style>
+</head>
+<body>
+	<div class="random-color">
+		
+	</div>
+</body>
+<script type="text/javascript">
+	window.onload = function () {
+		var randomColorDiv = document.querySelector('.random-color');
+		console.log(randomColorDiv);
+		var getRandomColor = function(){
+		  	return '#'+Math.floor(Math.random()*16777215).toString(16); 
+		}
+		randomColorDiv.style.backgroundColor = getRandomColor();
+		
+	}
+</script>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>时间计算</title>
+</head>
+<body>
+	<input type="text" name="nowTime">
+	</br>
+	<span>-</span>
+	</br>
+	<input type="text" name="preTime">
+	</br>
+	<span>=</span>
+	</br>
+	<input type="text" name="result">
+	</br></br>
+	<button id="btn">计算</button>
+</body>
+</html>
+<script type="text/javascript">
+	window.onload = function () {
+		var nowTime = document.querySelector('input[name="nowTime"]');
+		var preTime = document.querySelector('input[name="preTime"]');
+		var resDay = document.querySelector('input[name="result"]');
+		var oBtn = document.querySelector('#btn');
+		// var nTime = new Date('2017-12');
+		// var preTime = new Date('2017-10');
+		// var date = nTime.getTime() - preTime.getTime();
+		// var day = Math.floor(date/(24 * 3600 * 1000));
+		// console.log(day);  // 61
+		// var week = Math.floor(day/7); 
+		// console.log(week); // 8
+		oBtn.onclick = function() {
+			var inputNTime = new Date(nowTime.value);
+			console.log(inputNTime);
+			var inputPreTime = new Date(preTime.value);
+			console.log(inputPreTime);
+			var dateCount = inputNTime.getTime() - inputPreTime.getTime();
+			console.log(dateCount);
+			var dayCount = Math.floor(dateCount/(24 * 3600 * 1000));
+			resDay.value = dayCount + '天';
+			console.log(dayCount + '天');
+		}
+	}
+</script>

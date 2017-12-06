@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<style type="text/css">
+body{
+	padding-top: 100px;
+	padding-left: 100px;
+}
+	.deng {
+		display: block;
+		width: 20px;
+		height: 5px;
+		border-width: 2px 0 ;
+		border-style: solid;
+		border-color: red;
+	}
+	.cha {
+		 display: inline-block; 
+		 width: 20px;height:5px; 
+		 background: red;
+		 line-height: 0;
+		 font-size:0;
+		 vertical-align: middle;
+		 transform: rotate(45deg);
+		}
+  	.cha:after {
+  		content:'/';
+  		display:block;
+  		width: 20px;
+  		height:5px;
+  		background: red;
+  		transform: rotate(-90deg);
+  		}
+	.gou {
+	 display: inline-block;
+	 width: 100px;
+	 height:5px;
+	 background: red;
+	 line-height: 0;
+	 font-size:0;
+	 vertical-align: middle;
+	 -webkit-transform: rotate(45deg);
+	}
+	.gou:after {
+		content:'/';
+		display:block;
+		width: 200px;
+		height:5px;
+		background: red;
+		transform: rotate(-90deg) translateY(-50%) translateX(50%);
+	}
+</style>
+<body>
+
+<span class="deng"></span>
+<span class="cha"></span>
+<a href="" class="gou"></a>
+
+</body>
+</html>
