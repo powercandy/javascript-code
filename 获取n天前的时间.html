@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>获取n天前的时间</title>
+</head>
+<body>
+	
+</body>
+<script>
+	// 获取n天前的时间数组(未处理)
+	function getDateArray(n, date) {
+
+		let nowDate = date ? new Date(date) : new Date();
+		let dateArray = [];
+		for (var i = 0; i < n; i++ ) {
+			dateArray.unshift(new Date(nowDate.getTime() - i * 86400000));
+		}
+		return dateArray;
+	}
+	
+	// 处理获取的时间数组
+	function formatDate (array) {
+		return array.map(function(value) {
+			let y = value.getFullYear();
+			let m = value.getMonth() + 1;
+			let d = value.getDate();
+			if (Number(m) < 10) {
+				m = '0' + m;
+			}
+			if (Number(d) < 10) {
+				d = '0' + d;
+			}
+			return y.toString() + m.toString() + d.toString();
+		})
+	}
+	var nowD = '2017/10/14'; // 当前时间
+	var n = 10; // 获取多少天前的时间
+	var arr = getDateArray(n, nowD); // 以自定义时间 - 获取13天前的时间数组
+	// var arr = getDateArray(n); 		 // 以当前时间 - 获取13天前的时间数组
+	var realArr = formatDate(arr); // 处理完毕的时间数组
+	console.log(arr);
+	console.log(realArr);
+
+</script>
+</html>
